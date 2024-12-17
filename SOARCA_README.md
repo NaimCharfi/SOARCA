@@ -5,6 +5,12 @@ This guide provides step-by-step instructions to set up SOARCA and its necessary
 
 ---
 
+## Official Installation Link
+
+The official repository and documentation for SOARCA can be found here: [SOARCA GitHub Repository](https://github.com/COSSAS/SOARCA)
+
+---
+
 ## **1. Install Go Programming Language**
 
 ### **1.1 Remove Existing Go Installation**

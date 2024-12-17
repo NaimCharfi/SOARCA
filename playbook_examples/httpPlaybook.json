@@ -1,0 +1,64 @@
+{
+    "type": "playbook",
+    "spec_version": "cacao-2.0",
+    "id": "playbook--300270f9-0e64-42c8-93cc-0927edbe3ae7",
+    "name": "DDoS Detection via Log Analysis",
+    "description": "Detect and identify suspicious SUPI from logs indicative of potential DDoS attacks.",
+    "playbook_types": ["incident-response"],
+    "created_by": "identity--96abab60-238a-44ff-8962-5806aa60cbce",
+    "created": "2024-06-17T12:00:00.000Z",
+    "modified": "2024-06-17T12:00:00.000Z",
+    "valid_from": "2024-06-17T12:00:00.000Z",
+    "priority": 2,
+    "severity": 3,
+    "impact": 2,
+    "labels": ["http-api", "ddos-detection", "supi-analysis", "log-analysis"],
+    "agent_definitions": {
+        "soarca--00020001-1000-1000-a000-000100010001": {
+            "type": "soarca",
+            "name": "soarca-http-api"
+        }
+    },
+    "target_definitions": {
+        "http-api--1c3900b4-f86b-430d-b415-12312b9e31f4": {
+            "type": "http-api",
+            "name": "DDoS Log Analysis Server",
+            "address": {
+                "dname": ["myserver.local"]
+            },
+            "port": "80"
+        }
+    },
+    "workflow_start": "start--300270f9-0e64-42c8-93cc-0927edbe3ae7",
+    "workflow_exception": "end--a6f0b81e-affb-4bca-b4f6-a2d5af908958",
+    "workflow": {
+        "start--300270f9-0e64-42c8-93cc-0927edbe3ae7": {
+            "type": "start",
+            "name": "Start DDoS Detection Workflow",
+            "on_completion": "action--d52449fc-bf24-49fc-b000-123456789abc"
+        },
+        "action--d52449fc-bf24-49fc-b000-123456789abc": {
+            "type": "action",
+            "name": "Analyze Logs for Suspicious SUPI",
+            "description": "Execute a Python script to analyze logs and identify SUPI exceeding the threshold for DDoS detection.",
+            "on_completion": "end--116cdac5-63f1-4d8f-b3a8-e5667936e9b6",
+            "commands": [
+                {
+                    "type": "http-api",
+                    "command": "POST /execute HTTP/1.1",
+                    "headers": {
+                        "Content-Type": ["application/json"]
+                    },
+                    "content": "{ \"file\": \"/home/ubuntu/analyse_supi_logs.py\", \"args\": [\"/home/ubuntu/logs_supi.txt\", \"/home/ubuntu/supi_suspects.txt\"] }"
+                }
+            ],
+            "targets": ["http-api--1c3900b4-f86b-430d-b415-12312b9e31f4"],
+            "agent": "soarca--00020001-1000-1000-a000-000100010001"
+        },
+        "end--116cdac5-63f1-4d8f-b3a8-e5667936e9b6": {
+            "type": "end",
+            "name": "End DDoS Detection Workflow"
+        }
+    }
+}
+

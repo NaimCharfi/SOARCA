@@ -1,0 +1,56 @@
+from flask import Flask, request, jsonify
+import subprocess
+import os
+import logging
+
+# Configuration des logs
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+app = Flask(__name__)
+
+@app.route('/execute', methods=['POST'])
+def execute_command():
+    try:
+        # Récupérer la donnée POST
+        data = request.json
+        logging.info(f"Requête reçue : {data}")
+
+        # Exécution d'un fichier Python
+        file = data.get("file")
+        args = data.get("args", [])
+        if file and os.path.exists(file):
+            logging.info(f"Fichier Python exécuté : {file}")
+            command = ['python3', '-u', file] + args  # Mode non bufferisé
+            logging.info(f"Commande exécutée : {' '.join(command)}")
+
+            # Exécuter le script
+            result = subprocess.run(command, capture_output=True, text=True)
+
+            # Logs des résultats
+            logging.info(f"Code de retour : {result.returncode}")
+            logging.info(f"Stdout : {result.stdout.strip()}")
+            logging.info(f"Stderr : {result.stderr.strip()}")
+
+            # Retourner la sortie
+            if result.returncode == 0:
+                return jsonify({"status": "success", "output": result.stdout.strip()})
+            else:
+                return jsonify({"status": "error", "output": result.stderr.strip()})
+        elif file:
+            error_message = f"Fichier '{file}' non trouvé"
+            logging.error(error_message)
+            return jsonify({"status": "error", "message": error_message})
+
+        # Aucun argument fourni
+        error_message = "Aucun fichier fourni pour l'exécution"
+        logging.warning(error_message)
+        return jsonify({"status": "error", "message": error_message})
+
+    except Exception as e:
+        logging.exception(f"Erreur inattendue : {str(e)}")
+        return jsonify({"status": "error", "message": str(e)})
+
+if __name__ == '__main__':
+    logging.info("Démarrage du serveur Flask sur le port 80...")
+    app.run(host='0.0.0.0', port=80, debug=True)
+

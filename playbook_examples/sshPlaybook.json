@@ -1,0 +1,84 @@
+{
+    "type": "playbook",
+    "spec_version": "cacao-2.0",
+    "id": "playbook--300270f9-0e64-42c8-93cc-0927edbe3ae7",
+    "name": "Example SSH with Private Key",
+    "description": "This playbook demonstrates SSH functionality using private key authentication",
+    "playbook_types": ["notification"],
+    "created_by": "identity--96abab60-238a-44ff-8962-5806aa60cbce",
+    "created": "2023-11-20T15:56:00.123456Z",
+    "modified": "2023-11-20T15:56:00.123456Z",
+    "valid_from": "2023-11-20T15:56:00.123456Z",
+    "valid_until": "2123-11-20T15:56:00.123456Z",
+    "priority": 1,
+    "severity": 1,
+    "impact": 1,
+    "labels": ["soarca", "ssh", "example"],
+    "authentication_info_definitions": {
+        "private-key--b7ddc2ea-9f6a-4e82-8eaa-be202e942090": {
+            "type": "private-key",
+            "username": "ubuntu",
+            "private_key": "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAlwAAAAdzc2gtcnNhAAAAAwEAAQAAAIEAw+f7T5PKXKfdU0fWUm34V5SIuS+wNeb73ZJnqkgfj2hyR+gc8nLc1QG9FdVNNv27ZllCJX41KoGdt2XRgQ0tMvCtfq+/LdRyxU+Mw+1s8cBUmY7BRiOXVFLzuD6MKO6sL4A4kQAWZ27SVZJEqxUbqPsxdU3+YH9KlbaRMhuUdj8AAAIAvYV0y72FdMsAAAAHc3NoLXJzYQAAAIEAw+f7T5PKXKfdU0fWUm34V5SIuS+wNeb73ZJnqkgfj2hyR+gc8nLc1QG9FdVNNv27ZllCJX41KoGdt2XRgQ0tMvCtfq+/LdRyxU+Mw+1s8cBUmY7BRiOXVFLzuD6MKO6sL4A4kQAWZ27SVZJEqxUbqPsxdU3+YH9KlbaRMhuUdj8AAAADAQABAAAAgQC9Zs34nLkbpYt8VcqmvP1JpygcajehlWTSThZ9cedZXbCHRqid2mEYaurlbeiODvecNxWVbBR4uQHDauQHMbcMhMwh9u/hmduag2vaXIJnOoFDVfHrsvsiASwaCeFESVVGTFDK0MXfUtxKvPlB7iBm1t+Zv51n6ntLf3iYde+tiQAAAEATtLHr8M6XkPEnNq6Ix9ESblOyxgCVlcpaM5exBA3gwbrYS54cWX2CRt5lovj2FzvOpXSORZvSyKmyQih9hNseAAAAQQDhjEaXesq2NG6Zft59q5+2O4IFZrjogMX+cQpCVBykUbzEwadKuhMSWJ2QMgc5E+Yuipq79GcWc70S19EU+vcTAAAAQQDeWy7MNVa6O22cmDjiX1r7KK0Z3AelO4mKhGuP5nTqqu7o5dPrry4sSrsy6p/7tpxf6pZr0h1Jx8Fy7ba8Q82lAAAACnVidW50dUB2bTE=\n-----END OPENSSH PRIVATE KEY-----"
+        }
+    },
+    "agent_definitions": {
+        "soarca--00010001-1000-1000-a000-000100010001": {
+            "type": "soarca",
+            "name": "soarca-ssh"
+        }
+    },
+    "target_definitions": {
+        "ssh--1c3900b4-f86b-430d-b415-12312b9e31f4": {
+            "type": "ssh",
+            "name": "Test Target",
+            "address": {
+                "ipv4": ["10.37.0.114"]
+            },
+            "authentication_info": "private-key--b7ddc2ea-9f6a-4e82-8eaa-be202e942090"
+        }
+    },
+    "workflow_start": "start--9e7d62b2-88ac-4656-94e1-dbd4413ba008",
+    "workflow_exception": "end--a6f0b81e-affb-4bca-b4f6-a2d5af908958",
+    "workflow": {
+        "start--9e7d62b2-88ac-4656-94e1-dbd4413ba008": {
+            "type": "start",
+            "name": "Start SSH Example",
+            "on_completion": "action--eb9372d4-d524-49fc-bf24-be26ea084779"
+        },
+        "action--eb9372d4-d524-49fc-bf24-be26ea084779": {
+            "type": "action",
+            "name": "List Files",
+            "description": "List files in the home directory of the target system",
+            "on_completion": "action--88f4c4df-fa96-44e6-b310-1c06d193ea55",
+            "commands": [
+                {
+                    "type": "ssh",
+                    "command": "ls -la ~",
+                    "output_variable": "__ls_output__"
+                }
+            ],
+            "targets": ["ssh--1c3900b4-f86b-430d-b415-12312b9e31f4"],
+            "agent": "soarca--00010001-1000-1000-a000-000100010001"
+        },
+        "action--88f4c4df-fa96-44e6-b310-1c06d193ea55": {
+            "type": "action",
+            "name": "Touch File",
+            "description": "Create a file in the target system",
+            "on_completion": "end--116cdac5-63f1-4d8f-b3a8-e5667936e9b6",
+            "commands": [
+                {
+                    "type": "ssh",
+                    "command": "touch /home/ubuntu/file1"
+                }
+            ],
+            "targets": ["ssh--1c3900b4-f86b-430d-b415-12312b9e31f4"],
+            "agent": "soarca--00010001-1000-1000-a000-000100010001"
+        },
+        "end--116cdac5-63f1-4d8f-b3a8-e5667936e9b6": {
+            "type": "end",
+            "name": "End Flow"
+        }
+    }
+}
+
+
